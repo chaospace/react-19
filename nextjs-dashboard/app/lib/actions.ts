@@ -16,18 +16,22 @@ const FormSchema = z.object({
   date: z.string()
 })
 
-const CreateInvoice = FormSchema.omit({ id: true, date: true });
+const InvoiceDAO = FormSchema.omit({ id: true, date: true });
+
+const getInvoiceData = (formData: FormData) => {
+  return InvoiceDAO.parse({
+    customerId: formData.get('customerId'),
+    amount: formData.get('amount'),
+    status: formData.get('status')
+  });
+}
 
 /**
  * ? 서버액션이라 브라우저에서는 log가 안보임 terminal에서 확인
  * @param formData 
  */
 async function createInvoice(formData: FormData) {
-  const { customerId, amount, status } = CreateInvoice.parse({
-    customerId: formData.get('customerId'),
-    amount: formData.get('amount'),
-    status: formData.get('status')
-  });
+  const { customerId, amount, status } = getInvoiceData(formData);
   const amountInCents = amount * 100;
   const date = new Date().toISOString().split("T")[0];
   //db에 데이터 쓰기
@@ -37,8 +41,16 @@ async function createInvoice(formData: FormData) {
   redirect('/dashboard/invoices');
 }
 
+async function updateInvoice(id: string, formData: FormData) {
+  const { customerId, amount, status } = getInvoiceData(formData);
+  const amountInCents = amount * 100;
+  await sql`UPDATE invoices SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status} WHERE id = ${id}`;
+  revalidatePath('/dashboard/invoices');
+  redirect('/dashboard/invoices');
+}
 
 
 export {
-  createInvoice
+  createInvoice,
+  updateInvoice
 }
