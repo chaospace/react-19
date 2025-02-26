@@ -49,8 +49,18 @@ async function updateInvoice(id: string, formData: FormData) {
   redirect('/dashboard/invoices');
 }
 
+/**
+ * 송장 제거 api 
+ * ? url변경이 필요없을 경우는 revalidatePath만으로 캐시를 제거해 페이지 갱신이 가능.
+ * @param id 
+ */
+async function deleteInvoice(id: string) {
+  await sql`DELETE FROM invoices WHERE id = ${id}`;
+  revalidatePath('/dashboard/invoices');
+}
 
 export {
   createInvoice,
-  updateInvoice
+  updateInvoice,
+  deleteInvoice
 }
