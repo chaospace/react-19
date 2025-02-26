@@ -34,8 +34,13 @@ async function createInvoice(formData: FormData) {
   const { customerId, amount, status } = getInvoiceData(formData);
   const amountInCents = amount * 100;
   const date = new Date().toISOString().split("T")[0];
-  //db에 데이터 쓰기
-  await sql`INSERT INTO invoices (customer_id, amount, status, date) VALUES (${customerId}, ${amountInCents}, ${status}, ${date})`;
+  try {
+    //db에 데이터 쓰기
+    await sql`INSERT INTO invoices (customer_id, amount, status, date) VALUES (${customerId}, ${amountInCents}, ${status}, ${date})`;
+  } catch (error) {
+    // 콘솔을 통해 에러 확인
+    console.error(error);
+  }
   //패스 유효성 검증(캐시데이터 갱신) 후 리다이렉트
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
@@ -44,7 +49,12 @@ async function createInvoice(formData: FormData) {
 async function updateInvoice(id: string, formData: FormData) {
   const { customerId, amount, status } = getInvoiceData(formData);
   const amountInCents = amount * 100;
-  await sql`UPDATE invoices SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status} WHERE id = ${id}`;
+  try {
+    await sql`UPDATE invoices SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status} WHERE id = ${id}`;
+  } catch (error) {
+    console.error(error);
+  }
+
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
 }
@@ -55,6 +65,9 @@ async function updateInvoice(id: string, formData: FormData) {
  * @param id 
  */
 async function deleteInvoice(id: string) {
+  throw new Error('Failed to Delete Invoice');
+
+  // Unreachable code block
   await sql`DELETE FROM invoices WHERE id = ${id}`;
   revalidatePath('/dashboard/invoices');
 }
