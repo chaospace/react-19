@@ -1,14 +1,11 @@
 import { useState } from "react";
 import Head from "next/head";
-
-/* import Fuse from "fuse.js";
-import _ from "lodash"; */
-
 import { countries } from "../countries";
 import styles from "../styles/Home.module.css";
-// import CodeSampleModal from "../components/CodeSampleModal";
+import { Inter } from "next/font/google";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+const inter = Inter({ subsets: ["latin"] });
 // 동적으로 컴포넌트 참조
 const CodeSampleModal = dynamic(() => import("../components/CodeSampleModal"), {
   ssr: false,
@@ -28,10 +25,13 @@ export default function Start({ countries }) {
         <title>Core Web Vitals</title>
         <meta name="description" content="Core web vitals walk through" />
         <link rel="icon" href="/favicon.ico" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter"
-          rel="stylesheet"
-        />
+        <style jsx global>
+          {`
+            html {
+              font-family: ${inter.style.fontFamily};
+            }
+          `}
+        </style>
       </Head>
 
       <main className={styles.container}>
