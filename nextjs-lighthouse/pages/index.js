@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Head from "next/head";
 
-import Fuse from "fuse.js";
-import _ from "lodash";
+/* import Fuse from "fuse.js";
+import _ from "lodash"; */
 
 import { countries } from "../countries";
 import styles from "../styles/Home.module.css";
@@ -12,10 +12,10 @@ import Image from "next/image";
 export default function Start({ countries }) {
   const [results, setResults] = useState(countries);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const fuse = new Fuse(countries, {
+  /* const fuse = new Fuse(countries, {
     keys: ["name"],
     threshold: 0.3,
-  });
+  }); */
 
   return (
     <div>
@@ -52,6 +52,15 @@ export default function Start({ countries }) {
             onChange={async (e) => {
               const { value } = e.currentTarget;
 
+              // 동적 임포트 적용
+              const Fuse = (await import("fuse.js")).default;
+              const _ = (await import("lodash")).default;
+
+              const fuse = new Fuse(countries, {
+                keys: ["name"],
+                threshold: 0.3,
+              });
+
               const searchResult = fuse
                 .search(value)
                 .map((result) => result.item);
@@ -59,6 +68,7 @@ export default function Start({ countries }) {
               const updatedResults = searchResult.length
                 ? searchResult
                 : countries;
+
               setResults(updatedResults);
 
               // Fake analytics hit
